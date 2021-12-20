@@ -37,7 +37,8 @@ target_link_libraries(warwick-legend PRIVATE ${Geant4_LIBRARIES} ${ROOT_LIBRARIE
 # Copy macro needed to run in interactive mode to build directory.
 # By default, the macro is assumed to be in the working directory
 # where warwick-legend is run from.
-configure_file(vis.mac vis.mac COPYONLY)
+file(GLOB MACRO_FILES "*.mac")
+file(COPY ${MACRO_FILES} DESTINATION ${PROJECT_BINARY_DIR})
 
 # Test
 if(BUILD_TESTING)

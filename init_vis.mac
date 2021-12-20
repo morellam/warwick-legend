@@ -1,0 +1,6 @@
+/WLGD/detector/TurbineAndTube_NPanels 16
+/WLGD/detector/With_NeutronModerators 2
+/run/initialize
+/WLGD/generator/setGenerator ModeratorGammas
+
+/control/execute vis.mac
