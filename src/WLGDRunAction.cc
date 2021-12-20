@@ -22,7 +22,7 @@ WLGDRunAction::WLGDRunAction(WLGDEventAction* eventAction, G4String name)
 
   // Create directories
   analysisManager->SetVerboseLevel(1);
-  analysisManager->SetNtupleMerging(true);
+  //analysisManager->SetNtupleMerging(true);
 
   // -- write out some branches only if the information is also stored
 
