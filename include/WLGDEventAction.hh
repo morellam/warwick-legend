@@ -64,11 +64,16 @@ public:
   std::vector<G4double>& GetNeutronyTrack() { return out_neutron_track_y; }
   std::vector<G4double>& GetNeutronzTrack() { return out_neutron_track_z; }
 
+  //get Ge energy deposition, regardless of the detection time
+  std::vector<G4double>& GetGeEnergyDeposition()
+  {
+    return TotalEnergyDepositionInGe;
+  }
   std::vector<G4double>& GetLArEnergyDeposition()
   {
     return TotalEnergyDepositionInLAr_prompt;
   }
-  std::vector<G4double>& GetGeEnergyDeposition()
+  std::vector<G4double>& GetGeEnergyDeposition_prompt()
   {
     return TotalEnergyDepositionInGe_prompt;
   }
@@ -421,14 +426,19 @@ public:
   std::map<int, int> neutronProducerMap;
 
   void IncreaseByOne_NeutronInEvent() { NumberOfNeutronsProducedInEvent[0] += 1; }
+
   void IncreaseLArEnergyDeposition(G4double Edep, G4int whichReEntranceTube)
   {
     TotalEnergyDepositionInLAr_prompt[whichReEntranceTube] += Edep;
   }  
   void IncreaseGeEnergyDeposition(G4double Edep, G4int whichReEntranceTube)
   {
+    TotalEnergyDepositionInGe[whichReEntranceTube] += Edep;
+  }
+  void IncreaseGeEnergyDeposition_prompt(G4double Edep, G4int whichReEntranceTube)
+  {
     TotalEnergyDepositionInGe_prompt[whichReEntranceTube] += Edep;
-  }  
+  }    
   void IncreaseLArEnergyDeposition_delayed(G4double Edep, G4int whichReEntranceTube)
   {
     TotalEnergyDepositionInLAr_delayed[whichReEntranceTube] += Edep;
@@ -455,7 +465,11 @@ public:
   }  
   void IncreaseEdepPerDetector(G4int copyNumber, G4double Edep)
   {
-    EdepPerDetector[copyNumber] = EdepPerDetector[copyNumber] + Edep;
+    EdepPerDetector[copyNumber] += Edep;
+  }
+  void IncreaseEdepPerDetector_prompt(G4int copyNumber, G4double Edep)
+  {
+    EdepPerDetector_prompt[copyNumber] += Edep;
   }
   void IncreaseEdepPerDetector_delayed(G4int copyNumber, G4double Edep)
   {
@@ -643,7 +657,8 @@ private:
   std::vector<G4int>    v_Ge77mGammaEmission_whichVolume;
   std::vector<G4int>    v_Ge77mGammaEmission_whichGe77;
 
-  // - output of the total energy deposited in the different time frames (prompt < 10µs, delayed > 10µs and <1mus, after delayed > 1ms)
+  // - output of the total energy deposited in the different time frames (total deposition, prompt < 10µs, delayed > 10µs and <1mus, after delayed > 1ms)
+  std::vector<G4double> TotalEnergyDepositionInGe;
   std::vector<G4double> TotalEnergyDepositionInLAr_prompt;
   std::vector<G4double> TotalEnergyDepositionInGe_prompt;
   std::vector<G4double> TotalEnergyDepositionInLAr_delayed;
@@ -679,7 +694,8 @@ private:
   std::vector<G4double>     v_NDetector_delayed;
   std::vector<G4double>     v_NDetector_delayed_long;
   // - now at consideration a bit redudant, but it seems like it is a map with the id of the detector pointing at the energy deposited in it
-  std::map<G4int, G4double> EdepPerDetector;
+  std::map<G4int, G4double> EdepPerDetector;    //si usa con la mia generazione di dati
+  std::map<G4int, G4double> EdepPerDetector_prompt;
   std::map<G4int, G4double> EdepPerDetector_delayed;
   std::map<G4int, G4double> EdepPerDetector_delayed_long;
 

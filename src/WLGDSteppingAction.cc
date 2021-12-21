@@ -168,6 +168,30 @@ void WLGDSteppingAction::UserSteppingAction(const G4Step* aStep)
              ->GetName() == "Ge_log")
         {
           whichVolume = 1;
+          if(aStep->GetPostStepPoint()
+            ->GetTouchable()
+            ->GetVolume(1)
+            ->GetLogicalVolume()
+            ->GetName() == "Layer_log")
+          {
+            fEventAction->IncreaseEdepPerDetector(aStep->GetPostStepPoint()->GetTouchable()->GetVolume(1)->GetCopyNo() + whichReentranceTube * 96, aStep->GetTotalEnergyDeposit() / keV);
+            //commented out by Michele (could be useless)
+            /*
+            if(fRunAction->getWriteOutAdvancedMultiplicity())
+            {
+              if(fEventAction->GetIDListOfGdSiblingParticles().count(aStep->GetTrack()->GetParentID()))
+                fEventAction->IncreaseEdepPerDetector_prompt_onlyGd(aStep->GetPostStepPoint()->GetTouchable()->GetVolume(1)->GetCopyNo() + whichReentranceTube * 96, aStep->GetTotalEnergyDeposit() / eV);
+              else
+                fEventAction->IncreaseEdepPerDetector_prompt_woGd(aStep->GetPostStepPoint()->GetTouchable()->GetVolume(1)->GetCopyNo() + whichReentranceTube * 96, aStep->GetTotalEnergyDeposit() / eV);
+            } */ // w/ and w/o Gd info (redundant)
+            }
+            else
+              G4cout
+              << "Trying to access Layer_log for the prompt multiplicity but it is "
+              << aStep->GetPostStepPoint()->GetTouchable()->GetVolume(1)->GetLogicalVolume()->GetName()
+              << G4endl;
+          // total energy released in Ge detectors
+         
           if(aStep->GetPostStepPoint()->GetGlobalTime() / us < 10.)
           {
             if(aStep->GetPostStepPoint()
@@ -176,7 +200,7 @@ void WLGDSteppingAction::UserSteppingAction(const G4Step* aStep)
                  ->GetLogicalVolume()
                  ->GetName() == "Layer_log")
             {
-              fEventAction->IncreaseEdepPerDetector(
+              fEventAction->IncreaseEdepPerDetector_prompt(
                 aStep->GetPostStepPoint()->GetTouchable()->GetVolume(1)->GetCopyNo() +
                   whichReentranceTube * 96,
                 aStep->GetTotalEnergyDeposit() / eV);
@@ -265,7 +289,7 @@ void WLGDSteppingAction::UserSteppingAction(const G4Step* aStep)
           {
             fEventAction->IncreaseGeEnergyDeposition_after_delayed(
               aStep->GetTotalEnergyDeposit() / eV, whichReentranceTube);
-          }  // after delayed
+          } // after delayed
         }
 
         if(fRunAction->getIndividualGeDepositionInfo())

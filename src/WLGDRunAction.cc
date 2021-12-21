@@ -82,14 +82,12 @@ WLGDRunAction::WLGDRunAction(WLGDEventAction* eventAction, G4String name)
     analysisManager->CreateNtupleDColumn("Neutronztrack",
     fEventAction->GetNeutronzTrack());
   */
-  analysisManager->CreateNtupleDColumn("LArEnergyDeposition",
-                                       fEventAction->GetLArEnergyDeposition());
-  analysisManager->CreateNtupleDColumn("GeEnergyDeposition",
-                                       fEventAction->GetGeEnergyDeposition());
-  analysisManager->CreateNtupleDColumn("LArEnergyDeposition_delayed",
-                                       fEventAction->GetLArEnergyDeposition_delayed());
-  analysisManager->CreateNtupleDColumn("GeEnergyDeposition_delayed",
-                                       fEventAction->GetGeEnergyDeposition_delayed());
+  
+  analysisManager->CreateNtupleDColumn("GeEnergyDeposition",          fEventAction->GetGeEnergyDeposition());
+  analysisManager->CreateNtupleDColumn("LArEnergyDeposition_prompt",  fEventAction->GetLArEnergyDeposition());
+  analysisManager->CreateNtupleDColumn("GeEnergyDeposition_prompt",   fEventAction->GetGeEnergyDeposition_prompt());
+  analysisManager->CreateNtupleDColumn("LArEnergyDeposition_delayed", fEventAction->GetLArEnergyDeposition_delayed());
+  analysisManager->CreateNtupleDColumn("GeEnergyDeposition_delayed",  fEventAction->GetGeEnergyDeposition_delayed());
   if(fWriteOutAdvancedMultiplicity)
     analysisManager->CreateNtupleDColumn(
       "LArEnergyDeposition_delayed_long",

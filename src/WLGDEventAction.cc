@@ -225,6 +225,12 @@ void WLGDEventAction::BeginOfEventAction(const G4Event*
   v_nCOther_A.clear();
   v_nCOther_ZC.clear();
 
+  TotalEnergyDepositionInGe.clear();
+  TotalEnergyDepositionInGe.push_back(0);
+  TotalEnergyDepositionInGe.push_back(0);
+  TotalEnergyDepositionInGe.push_back(0);
+  TotalEnergyDepositionInGe.push_back(0);
+
   TotalEnergyDepositionInLAr_prompt.clear();
   TotalEnergyDepositionInLAr_prompt.push_back(0);
   TotalEnergyDepositionInLAr_prompt.push_back(0);
@@ -285,6 +291,7 @@ void WLGDEventAction::BeginOfEventAction(const G4Event*
   IndividualEnergyDeposition_DetectorNumber.clear();
 
   EdepPerDetector.clear();
+  EdepPerDetector_prompt.clear();
   EdepPerDetector_delayed.clear();
   EdepPerDetector_delayed_long.clear();
 
@@ -371,9 +378,20 @@ void WLGDEventAction::EndOfEventAction(const G4Event* event)
     zloc.push_back((hh->GetPos()).z() / G4Analysis::GetUnitValue("m"));
     ReentranceTube.push_back(hh->GetWhichReentranceTube());
     DetectorNumber.push_back(hh->GetWhichDetector());
-  }
+  } 
 
   for(auto const& x : EdepPerDetector)
+  {
+    int tmp_i = (int) (x.first / 96);
+    //variables that should be defined and added here in case I need them for analyses 
+    //(regardless emission time of photons/whatever that is detected)
+    //Multiplicity_prompt[tmp_i] += 1;
+    //v_NDetector_prompt.push_back(x.first);
+    //v_EdepPerDetector_prompt.push_back(x.second);
+    IncreaseGeEnergyDeposition(x.second, tmp_i);
+  }
+
+  for(auto const& x : EdepPerDetector_prompt)
   {
     if(x.second < 1e4)
       continue;
@@ -381,7 +399,7 @@ void WLGDEventAction::EndOfEventAction(const G4Event* event)
     Multiplicity_prompt[tmp_i] += 1;
     v_NDetector_prompt.push_back(x.first);
     v_EdepPerDetector_prompt.push_back(x.second);
-    IncreaseGeEnergyDeposition(x.second, tmp_i);
+    IncreaseGeEnergyDeposition_prompt(x.second, tmp_i);
   }
 
   for(auto const& x : EdepPerDetector_delayed)

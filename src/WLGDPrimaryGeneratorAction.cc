@@ -313,7 +313,7 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
       throw std::runtime_error(
         std::string("Do not use BoratedPENeutrons generator without using Neutron Moderators! ):"));
 
-    std::uniform_int_distribution<int> distribution(0, 4);
+    std::uniform_int_distribution<int> distribution(0, 3);
     std::uniform_real_distribution<>   rndm(0.0, 1.0);
 
     G4double ran_x, ran_y, ran_z;
@@ -558,10 +558,12 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
       throw std::runtime_error(
         std::string("Do not use BoratedPENeutrons generator without using Neutron Moderators! ):"));
 
-    std::uniform_int_distribution<int> distribution(0, 4);
+    std::uniform_int_distribution<int> distribution(0, 3);
     std::uniform_real_distribution<>   rndm(0.0, 1.0);
 
     G4double ran_x, ran_y, ran_z;
+    const G4int nReentranceTube = 4;
+    G4double ranx[nReentranceTube], rany[nReentranceTube], ranz[nReentranceTube];
 
     // - depending on the different types of moderator design
     if(type == 1)
@@ -569,36 +571,21 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
       G4double curad              = 40.0;
       G4double BoratedPETouterrad = 5.0;
       G4double cuhheight          = 400.0 / 2.;
+      G4double offsetx[nReentranceTube] = {1.,0.,-1.,0};
+      G4double offsety[nReentranceTube] = {0.,1.,0.,-1};
 
-      G4int    whichReentranceTube = distribution(generator);
-      G4double offset_x, offset_y;
-      if(whichReentranceTube == 0)
+      //G4int    whichReentranceTube = distribution(generator);
+      //G4double offset_x, offset_y;
+      
+      for(int i = 0; i < nReentranceTube; i++)
       {
-        offset_x = 1 * m;
-        offset_y = 0 * m;
-      }
-      if(whichReentranceTube == 1)
-      {
-        offset_x = 0 * m;
-        offset_y = 1 * m;
-      }
-      if(whichReentranceTube == 2)
-      {
-        offset_x = -1 * m;
-        offset_y = 0 * m;
-      }
-      if(whichReentranceTube == 3)
-      {
-        offset_x = 0 * m;
-        offset_y = -1 * m;
-      }
+        G4double ran_rad = curad * cm + BoratedPETouterrad * cm * rndm(generator);
+        G4double ran_phi = 360 * deg * rndm(generator);
 
-      G4double ran_rad = curad * cm + BoratedPETouterrad * cm * rndm(generator);
-      G4double ran_phi = 360 * deg * rndm(generator);
-
-      ran_x = ran_rad * sin(ran_phi) + offset_x;
-      ran_y = ran_rad * cos(ran_phi) + offset_y;
-      ran_z = cuhheight * cm * (1 - 2 * rndm(generator));
+        ranx[i] = ran_rad * sin(ran_phi) + offsetx[i] * m;
+        rany[i] = ran_rad * cos(ran_phi) + offsety[i] * m;
+        ranz[i] = cuhheight * cm * (1 - 2 * rndm(generator));
+      }
     }
 
     if(type == 2)
@@ -667,16 +654,11 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
           ran_z -= BPE_hei;
       }
     }
-
-    G4double particle_time = 0 * s;
-    G4double theta = rndm(generator) * 180. * deg;
-    G4double phi   = rndm(generator) * 360. * deg;
+    
     G4double x     = ran_x;
     G4double y     = ran_y;
     G4double z     = ran_z;
 
-
-    //Co-60         -> Z = 27 
     //Thorium-232   -> Z = 90
     //Uranium-238   -> Z = 92
     G4int Z = 92;
@@ -692,10 +674,20 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     fParticleGun->SetParticleCharge(charge);
     
     fParticleGun->SetParticleEnergy(energy);
-
-    fParticleGun->SetParticlePosition(G4ThreeVector(x, y, z));
     
-    fParticleGun->GeneratePrimaryVertex(event);
+    if(type == 1)
+    {
+      for(int i = 0; i < nReentranceTube; i++)
+      {
+        fParticleGun->SetParticlePosition(G4ThreeVector(ranx[i], rany[i], ranz[i]));
+        fParticleGun->GeneratePrimaryVertex(event);
+      }
+    }
+    else
+    {
+      fParticleGun->SetParticlePosition(G4ThreeVector(x, y, z));
+      fParticleGun->GeneratePrimaryVertex(event);
+    }
   }
 }
 
