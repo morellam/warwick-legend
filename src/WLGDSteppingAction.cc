@@ -54,26 +54,10 @@ void WLGDSteppingAction::UserSteppingAction(const G4Step* aStep)
   {
     if(aStep->GetTrack()->GetVolume()->GetName() == "World_phys")
       return;
-    if((aStep->GetPostStepPoint()
-          ->GetTouchable()
-          ->GetVolume(0)
-          ->GetLogicalVolume()
-          ->GetName() == "Lar_log") ||
-       aStep->GetPostStepPoint()
-           ->GetTouchable()
-           ->GetVolume(0)
-           ->GetLogicalVolume()
-           ->GetName() == "ULar_log" ||
-       aStep->GetPostStepPoint()
-           ->GetTouchable()
-           ->GetVolume(0)
-           ->GetLogicalVolume()
-           ->GetName() == "Ge_log" ||
-       aStep->GetPostStepPoint()
-           ->GetTouchable()
-           ->GetVolume(0)
-           ->GetLogicalVolume()
-           ->GetName() == "Water_log")
+    if((aStep->GetPostStepPoint()->GetTouchable()->GetVolume(0)->GetLogicalVolume()->GetName() == "Lar_log") ||
+        aStep->GetPostStepPoint()->GetTouchable()->GetVolume(0)->GetLogicalVolume()->GetName() == "ULar_log" ||
+        aStep->GetPostStepPoint()->GetTouchable()->GetVolume(0)->GetLogicalVolume()->GetName() == "Ge_log"   ||
+        aStep->GetPostStepPoint()->GetTouchable()->GetVolume(0)->GetLogicalVolume()->GetName() == "Water_log" )
     {
       if(aStep->GetTotalEnergyDeposit() > 0)
       {
@@ -94,85 +78,51 @@ void WLGDSteppingAction::UserSteppingAction(const G4Step* aStep)
           whichReentranceTube = 3;
 
         if(fDetectorConstruction->GetGeometryName() == "hallA" ||
-           aStep->GetPostStepPoint()
-               ->GetTouchable()
-               ->GetVolume(0)
-               ->GetLogicalVolume()
-               ->GetName() == "Lar_log" ||
-           aStep->GetPostStepPoint()
-               ->GetTouchable()
-               ->GetVolume(0)
-               ->GetLogicalVolume()
-               ->GetName() == "Water_log")
+           aStep->GetPostStepPoint()->GetTouchable()->GetVolume(0)->GetLogicalVolume()->GetName() == "Lar_log" ||
+           aStep->GetPostStepPoint()->GetTouchable()->GetVolume(0)->GetLogicalVolume()->GetName() == "Water_log")
           whichReentranceTube = 0;
 
         // calculate total energy deposition in water tank for muon veto
-        if(aStep->GetPostStepPoint()
-             ->GetTouchable()
-             ->GetVolume(0)
-             ->GetLogicalVolume()
-             ->GetName() == "Water_log")
+        if(aStep->GetPostStepPoint()->GetTouchable()->GetVolume(0)->GetLogicalVolume()->GetName() == "Water_log")
         {
-          // if(aStep->GetPostStepPoint()->GetGlobalTime() / us < 10.)
           fEventAction->IncreaseEdepWater_prompt(aStep->GetTotalEnergyDeposit() / eV);
-          // else if(aStep->GetPostStepPoint()->GetGlobalTime() / ms < 1.)
-          // fEventAction->IncreaseEdepWater_delayed(aStep->GetTotalEnergyDeposit() / eV);
           return;
         }
 
         // LAr veto
 
         G4int whichVolume = -1;
-        if(aStep->GetPostStepPoint()
-               ->GetTouchable()
-               ->GetVolume(0)
-               ->GetLogicalVolume()
-               ->GetName() == "ULar_log" ||
-           (fDetectorConstruction->GetGeometryName() == "hallA" &&
-            aStep->GetTrack()->GetLogicalVolumeAtVertex()->GetName() == "Lar_log"))
+        if(aStep->GetPostStepPoint()->GetTouchable()->GetVolume(0)->GetLogicalVolume()->GetName() == "ULar_log" ||
+           (fDetectorConstruction->GetGeometryName() == "hallA" && aStep->GetTrack()->GetLogicalVolumeAtVertex()->GetName() == "Lar_log"))
         {
           whichVolume = 0;
           if(aStep->GetPostStepPoint()->GetGlobalTime() / us < 10.)
           {
-            fEventAction->IncreaseLArEnergyDeposition(aStep->GetTotalEnergyDeposit() / eV,
-                                                      whichReentranceTube);
+            fEventAction->IncreaseLArEnergyDeposition(aStep->GetTotalEnergyDeposit() / eV, whichReentranceTube);
           }  // prompt
           else
           {
             if(aStep->GetPostStepPoint()->GetGlobalTime() / ms < 1.)
             {
-              fEventAction->IncreaseLArEnergyDeposition_delayed(
-                aStep->GetTotalEnergyDeposit() / eV, whichReentranceTube);
+              fEventAction->IncreaseLArEnergyDeposition_delayed(aStep->GetTotalEnergyDeposit() / eV, whichReentranceTube);
             }  // delayed
-            if(aStep->GetPostStepPoint()->GetGlobalTime() / s < 1. &&
-               fRunAction->getWriteOutAdvancedMultiplicity())
+            if(aStep->GetPostStepPoint()->GetGlobalTime() / s < 1. && fRunAction->getWriteOutAdvancedMultiplicity())
             {
-              fEventAction->IncreaseLArEnergyDeposition_delayed_long(
-                aStep->GetTotalEnergyDeposit() / eV, whichReentranceTube);
+              fEventAction->IncreaseLArEnergyDeposition_delayed_long(aStep->GetTotalEnergyDeposit() / eV, whichReentranceTube);
             }  // long delayed
           }
-          if(aStep->GetPostStepPoint()->GetGlobalTime() / s > 1. &&
-             fRunAction->getWriteOutAdvancedMultiplicity())
+          if(aStep->GetPostStepPoint()->GetGlobalTime() / s > 1. && fRunAction->getWriteOutAdvancedMultiplicity())
           {
-            fEventAction->IncreaseLArEnergyDeposition_after_delayed(
-              aStep->GetTotalEnergyDeposit() / eV, whichReentranceTube);
+            fEventAction->IncreaseLArEnergyDeposition_after_delayed(aStep->GetTotalEnergyDeposit() / eV, whichReentranceTube);
           }  // after delayed
         }
 
         // Ge energy
 
-        if(aStep->GetPostStepPoint()
-             ->GetTouchable()
-             ->GetVolume(0)
-             ->GetLogicalVolume()
-             ->GetName() == "Ge_log")
+        if(aStep->GetPostStepPoint()->GetTouchable()->GetVolume(0)->GetLogicalVolume()->GetName() == "Ge_log")
         {
           whichVolume = 1;
-          if(aStep->GetPostStepPoint()
-            ->GetTouchable()
-            ->GetVolume(1)
-            ->GetLogicalVolume()
-            ->GetName() == "Layer_log")
+          if(aStep->GetPostStepPoint()->GetTouchable()->GetVolume(1)->GetLogicalVolume()->GetName() == "Layer_log")
           {
             fEventAction->IncreaseEdepPerDetector(aStep->GetPostStepPoint()->GetTouchable()->GetVolume(1)->GetCopyNo() + whichReentranceTube * 96, aStep->GetTotalEnergyDeposit() / keV);
             //commented out by Michele (could be useless)

@@ -49,8 +49,8 @@ G4bool WLGDCrystalSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   // particle filter on Ge-77
   auto iZ = aStep->GetTrack()->GetDefinition()->GetAtomicNumber();
   auto iA = aStep->GetTrack()->GetDefinition()->GetAtomicMass();
-  if(!(iZ == 32 && iA == 77))
-    return false;
+  //if(!(iZ == 32 && iA == 77))       //comment these two lines to save also nonGe-77 events
+  //  return false;
 
   WLGDCrystalHit* newHit = new WLGDCrystalHit();
 
