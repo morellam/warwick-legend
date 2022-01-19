@@ -1,6 +1,15 @@
-/WLGD/detector/TurbineAndTube_NPanels 16
+/WLGD/detector/TurbineAndTube_NPanels 10
+/WLGD/detector/TurbineAndTube_Radius 270
+/WLGD/detector/TurbineAndTube_Length 170
 /WLGD/detector/With_NeutronModerators 2
+
 /run/initialize
+
 /WLGD/generator/setGenerator ModeratorGammas
+
+/process/had/rdm/nucleusLimits 214 214 83 83 
+
+/gun/particle ion
+/gun/ion 83 214
 
 /control/execute vis.mac

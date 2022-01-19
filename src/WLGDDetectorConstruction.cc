@@ -891,10 +891,10 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
 
   if(fWithBoratedPET == 2)
   {
-    G4double densityOfBPE   = 0.95;
-    double   radiusOfPanels = fBoratedTurbineRadius * cm;
-    double   constantAngle  = fBoratedTurbineAngle * deg;  // 45 * deg;
-    int      NPanels;
+    G4double   densityOfBPE   = 0.95;
+    G4double   radiusOfPanels = fBoratedTurbineRadius * cm;
+    G4double   constantAngle  = fBoratedTurbineAngle * deg;  // 45 * deg;
+    G4int      NPanels;
 
     if(fBoratedTurbineNPanels == 0)
       NPanels = ceil(2 * 3.14159265 * radiusOfPanels / cm /
@@ -903,10 +903,11 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
       NPanels = fBoratedTurbineNPanels;
 
     fNPanels          = NPanels;
-    double anglePanel = 360. / NPanels * deg;
+    G4double anglePanel = 360. / NPanels * deg;
 
     G4double totalVolume = NPanels * 2 * b_length / cm * 2 * b_width / cm * b_height / cm;
 
+    G4cout << "Total Volume of B-PE: " << totalVolume << G4endl;
     G4cout << "Total Mass of B-PE: " << totalVolume * densityOfBPE << G4endl;
 
     G4double          zpos = 0 * cm;

@@ -15,12 +15,6 @@
 #include <fstream>
 #include <random>
 #include <set>
-/*#include "TH1F.h"
-#include "TFile.h"*/
-//#include "TH1.h"
-
-// G4String WLGDPrimaryGeneratorAction::fFileName;
-// std::ifstream* WLGDPrimaryGeneratorAction::fInputFile;
 
 WLGDPrimaryGeneratorAction::WLGDPrimaryGeneratorAction(WLGDDetectorConstruction* det)
 : G4VUserPrimaryGeneratorAction()
@@ -562,37 +556,49 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     std::uniform_real_distribution<>   rndm(0.0, 1.0);
 
     G4double ran_x, ran_y, ran_z;
-    const G4int nReentranceTube = 4;
-    G4double ranx[nReentranceTube], rany[nReentranceTube], ranz[nReentranceTube];
-
-    // - depending on the different types of moderator design
+    // - depending on the different types of moderator design    
     if(type == 1)
     {
       G4double curad              = 40.0;
       G4double BoratedPETouterrad = 5.0;
       G4double cuhheight          = 400.0 / 2.;
-      G4double offsetx[nReentranceTube] = {1.,0.,-1.,0};
-      G4double offsety[nReentranceTube] = {0.,1.,0.,-1};
 
-      //G4int    whichReentranceTube = distribution(generator);
-      //G4double offset_x, offset_y;
-      
-      for(int i = 0; i < nReentranceTube; i++)
+      G4int    whichReentranceTube = distribution(generator);
+      G4double offset_x, offset_y;
+      if(whichReentranceTube == 0)
       {
-        G4double ran_rad = curad * cm + BoratedPETouterrad * cm * rndm(generator);
-        G4double ran_phi = 360 * deg * rndm(generator);
-
-        ranx[i] = ran_rad * sin(ran_phi) + offsetx[i] * m;
-        rany[i] = ran_rad * cos(ran_phi) + offsety[i] * m;
-        ranz[i] = cuhheight * cm * (1 - 2 * rndm(generator));
+        offset_x = 1 * m;
+        offset_y = 0 * m;
       }
+      if(whichReentranceTube == 1)
+      {
+        offset_x = 0 * m;
+        offset_y = 1 * m;
+      }
+      if(whichReentranceTube == 2)
+      {
+        offset_x = -1 * m;
+        offset_y = 0 * m;
+      }
+      if(whichReentranceTube == 3)
+      {
+        offset_x = 0 * m;
+        offset_y = -1 * m;
+      }
+
+      G4double ran_rad = curad * cm + BoratedPETouterrad * cm * rndm(generator);
+      G4double ran_phi = 360 * deg * rndm(generator);
+
+      ran_x = ran_rad * sin(ran_phi) + offset_x;
+      ran_y = ran_rad * cos(ran_phi) + offset_y;
+      ran_z = cuhheight * cm * (1 - 2 * rndm(generator));
     }
 
     if(type == 2)
     {
       G4int                              BPE_N = fDetector->GetBoratedTurbinezNPanels();
-      double                             anglePanel = 360. / BPE_N * deg;
-      std::uniform_int_distribution<int> distribution_2(0, BPE_N);
+      G4double                           anglePanel = 360. / BPE_N * deg;
+      std::uniform_int_distribution<int> distribution_2(0, BPE_N - 1);
       G4int                              whichPanel = distribution_2(generator);
 
       G4double BPE_rad  = fDetector->GetBoratedTurbineRadius();
@@ -608,7 +614,7 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
       G4double tmp_x = BPE_wid / 2. * cm * (1 - 2 * rndm(generator));
       G4double tmp_y = BPE_len / 2. * cm * (1 - 2 * rndm(generator));
 
-      G4double tmp_ang = whichPanel * anglePanel + BPE_ang * deg;
+      G4double tmp_ang = - whichPanel * anglePanel + BPE_ang * deg;
 
       ran_x = (tmp_x * cos(tmp_ang) + tmp_y * sin(tmp_ang)) + offset_x;
       ran_y = (tmp_y * cos(tmp_ang) - tmp_x * sin(tmp_ang)) + offset_y;
@@ -619,11 +625,11 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     {
       G4double BPE_rad  = fDetector->GetBoratedTurbineRadius();
       G4double BPE_wid  = fDetector->GetBoratedTurbineWidth();
-      G4double BPE_hei  = fDetector->GetBoratedTurbineHeight() / 2.;
+      G4double BPE_hei  = fDetector->GetBoratedTurbineHeight();
       G4double BPE_zPos = fDetector->GetBoratedTurbinezPosition() * cm - 100 * cm;
 
       G4double volume_cyl =
-        3.1415926535 * BPE_hei * 2 * (pow(BPE_rad + BPE_wid, 2) - pow(BPE_rad, 2));
+        3.1415926535 * BPE_hei * (pow(BPE_rad + BPE_wid, 2) - pow(BPE_rad, 2));
       G4double volume_top = 3.1415926535 * BPE_wid * pow(BPE_rad + BPE_wid, 2);
 
       G4double prob_cyl = volume_cyl / (volume_cyl + 2 * volume_top);
@@ -639,19 +645,19 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
         G4double ran_phi = 360 * deg * rndm(generator);
         ran_x            = ran_rad * sin(ran_phi);
         ran_y            = ran_rad * cos(ran_phi);
-        ran_z            = BPE_hei * (1 - 2 * rndm(generator));
+        ran_z            = 2 * BPE_hei * (1 - 2 * rndm(generator)) + BPE_zPos;
       }
       if(where > 0)
       {
-        G4double ran_rad = BPE_rad * cm * rndm(generator);
+        G4double ran_rad = BPE_rad * cm * sqrt(rndm(generator));
         G4double ran_phi = 360 * deg * rndm(generator);
         ran_x            = ran_rad * sin(ran_phi);
         ran_y            = ran_rad * cos(ran_phi);
         ran_z            = BPE_wid * (1 - 2 * rndm(generator));
         if(where == 1)
-          ran_z += BPE_hei;
+          ran_z += 2 * BPE_hei + BPE_zPos;
         if(where == 2)
-          ran_z -= BPE_hei;
+          ran_z -= 2 * BPE_hei - BPE_zPos;
       }
     }
     
@@ -659,35 +665,14 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     G4double y     = ran_y;
     G4double z     = ran_z;
 
-    //Thorium-232   -> Z = 90
-    //Uranium-238   -> Z = 92
-    G4int Z = 92;
-    G4int A = 238;
     G4double charge = 0.*eplus;
     G4double energy = 0.*keV;
-
-    G4ParticleDefinition *ion = G4IonTable::GetIonTable()->GetIon(Z, A, energy);
-
+    
     fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0., 0., 1.));
-    fParticleGun->SetParticleDefinition(ion);
-    
     fParticleGun->SetParticleCharge(charge);
-    
     fParticleGun->SetParticleEnergy(energy);
-    
-    if(type == 1)
-    {
-      for(int i = 0; i < nReentranceTube; i++)
-      {
-        fParticleGun->SetParticlePosition(G4ThreeVector(ranx[i], rany[i], ranz[i]));
-        fParticleGun->GeneratePrimaryVertex(event);
-      }
-    }
-    else
-    {
-      fParticleGun->SetParticlePosition(G4ThreeVector(x, y, z));
-      fParticleGun->GeneratePrimaryVertex(event);
-    }
+    fParticleGun->SetParticlePosition(G4ThreeVector(x, y, z));
+    fParticleGun->GeneratePrimaryVertex(event);
   }
 }
 
