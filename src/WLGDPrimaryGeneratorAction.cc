@@ -628,6 +628,11 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
       G4double BPE_hei  = fDetector->GetBoratedTurbineHeight();
       G4double BPE_zPos = fDetector->GetBoratedTurbinezPosition() * cm - 100 * cm;
 
+      // // G4cout << "Tube radius: " << BPE_rad  << G4endl;
+      //  G4cout << "Tube width: " << BPE_wid << G4endl;
+      //  G4cout << "Tube height: " << BPE_hei << G4endl;
+      //  G4cout << "Tube z position: " << BPE_zPos / cm  << G4endl;
+
       G4double volume_cyl =
         3.1415926535 * BPE_hei * (pow(BPE_rad + BPE_wid, 2) - pow(BPE_rad, 2));
       G4double volume_top = 3.1415926535 * BPE_wid * pow(BPE_rad + BPE_wid, 2);
@@ -636,7 +641,6 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
       G4double prob_top = (1 - prob_cyl) / 2.;
 
       std::discrete_distribution<> distribution_2({ prob_cyl, prob_top, prob_top });
-
       G4int where = distribution_2(generator);
 
       if(where == 0)
@@ -645,19 +649,24 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
         G4double ran_phi = 360 * deg * rndm(generator);
         ran_x            = ran_rad * sin(ran_phi);
         ran_y            = ran_rad * cos(ran_phi);
-        ran_z            = 2 * BPE_hei * (1 - 2 * rndm(generator)) + BPE_zPos;
+        ran_z            = 1.25 * 2 * BPE_hei * (1 - 2 * rndm(generator)) + BPE_zPos;
       }
       if(where > 0)
       {
-        G4double ran_rad = BPE_rad * cm * sqrt(rndm(generator));
+        G4double ran_rad = (BPE_rad + BPE_wid) * cm * sqrt(rndm(generator));
         G4double ran_phi = 360 * deg * rndm(generator);
         ran_x            = ran_rad * sin(ran_phi);
         ran_y            = ran_rad * cos(ran_phi);
-        ran_z            = BPE_wid * (1 - 2 * rndm(generator));
         if(where == 1)
-          ran_z += 2 * BPE_hei + BPE_zPos;
+        {
+          ran_z  =  BPE_wid * 10  * rndm(generator);
+          ran_z += 2 *  BPE_hei + BPE_zPos + 30 * cm;
+        }
         if(where == 2)
-          ran_z -= 2 * BPE_hei - BPE_zPos;
+        {
+          ran_z  =  BPE_wid * 10 * (-rndm(generator));
+          ran_z +=  - 2 * BPE_hei + BPE_zPos - 30 * cm;
+        }
       }
     }
     
