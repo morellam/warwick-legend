@@ -27,6 +27,7 @@ private:
   double           tmp_neutronTime;
   double           tmp_MuonXpos, tmp_MuonYpos, tmp_MuonZpos;
   double           tmp_MuonXmom, tmp_MuonYmom, tmp_MuonZmom;
+  double           tmp_MuonEnergy; 
   WLGDEventAction* fEventAction;
   WLGDRunAction*   fRunAction;
 };

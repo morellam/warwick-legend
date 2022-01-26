@@ -287,7 +287,7 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   {
     if(neutronEnergySpectrumInBPE == 0)
     {
-      string   filelistName = "../data/resultingSpectrum.txt";
+      string   filelistName = "../data/PE-DEAP.txt";
       ifstream filestream;
       filestream.open(filelistName.c_str());
       vector<double> x_val;
@@ -354,7 +354,7 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     {
       G4int                              BPE_N = fDetector->GetBoratedTurbinezNPanels();
       double                             anglePanel = 360. / BPE_N * deg;
-      std::uniform_int_distribution<int> distribution_2(0, BPE_N);
+      std::uniform_int_distribution<int> distribution_2(0, BPE_N - 1);
       G4int                              whichPanel = distribution_2(generator);
 
       G4double BPE_rad  = fDetector->GetBoratedTurbineRadius();
@@ -370,7 +370,7 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
       G4double tmp_x = BPE_wid / 2. * cm * (1 - 2 * rndm(generator));
       G4double tmp_y = BPE_len / 2. * cm * (1 - 2 * rndm(generator));
 
-      G4double tmp_ang = whichPanel * anglePanel + BPE_ang * deg;
+      G4double tmp_ang = - whichPanel * anglePanel + BPE_ang * deg;
 
       ran_x = (tmp_x * cos(tmp_ang) + tmp_y * sin(tmp_ang)) + offset_x;
       ran_y = (tmp_y * cos(tmp_ang) - tmp_x * sin(tmp_ang)) + offset_y;
@@ -418,8 +418,8 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     }
 
     G4double particle_time = 0 * s;
-    G4double energy        = (*neutronEnergySpectrumInBPE)(generator) *keV;
-    //G4cout << energy << G4endl;
+    G4double energy        = (*neutronEnergySpectrumInBPE)(generator) *MeV;
+    //G4cout << energy / MeV << G4endl;
     G4double theta = rndm(generator) * 180. * deg;
     G4double phi   = rndm(generator) * 360. * deg;
     G4double x     = ran_x;

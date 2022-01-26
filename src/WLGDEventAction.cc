@@ -92,6 +92,7 @@ void WLGDEventAction::BeginOfEventAction(const G4Event*
   Muonxmom.clear();
   Muonymom.clear();
   Muonzmom.clear();
+  MuonEnergy.clear();
 
   neutronxloc.clear();
   neutronyloc.clear();

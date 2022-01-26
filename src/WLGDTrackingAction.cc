@@ -27,8 +27,10 @@ void WLGDTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
   }
 
   // Adding tracking of initial muons
-  if(aTrack->GetParticleDefinition()->GetParticleName() == "mu-" ||
-     aTrack->GetParticleDefinition()->GetParticleName() == "mu+")
+  //if(aTrack->GetParticleDefinition()->GetParticleName() == "mu-" ||
+  //   aTrack->GetParticleDefinition()->GetParticleName() == "mu+")
+  if(aTrack->GetParticleDefinition()->GetParticleName() == "neutron")
+  //if(aTrack->GetParticleDefinition()->GetPDGCharge() == 81)
   {
     auto tmp_vector = aTrack->GetVertexPosition();
     tmp_MuonXpos    = tmp_vector.getX() / m;
@@ -38,6 +40,7 @@ void WLGDTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
     tmp_MuonXmom    = tmp_vector.getX();
     tmp_MuonYmom    = tmp_vector.getY();
     tmp_MuonZmom    = tmp_vector.getZ();
+    tmp_MuonEnergy = aTrack->GetKineticEnergy() / MeV;
   }
 
   // Edit: 2021/03/30 by Moritz Neuberger
@@ -124,6 +127,7 @@ void WLGDTrackingAction::PostUserTrackingAction(const G4Track* aTrack)
     fEventAction->AddMuonxMom(tmp_MuonXmom);
     fEventAction->AddMuonyMom(tmp_MuonYmom);
     fEventAction->AddMuonzMom(tmp_MuonZmom);
+    fEventAction->AddMuonEnergy(tmp_MuonEnergy);
   }
 
   if(fRunAction->getWriteOutNeutronProductionInfo() == 1)

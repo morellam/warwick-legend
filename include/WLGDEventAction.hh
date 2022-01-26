@@ -46,6 +46,7 @@ public:
   std::vector<G4double>& GetMuonxMom() { return Muonxmom; }
   std::vector<G4double>& GetMuonyMom() { return Muonymom; }
   std::vector<G4double>& GetMuonzMom() { return Muonzmom; }
+  std::vector<G4double>& GetMuonEnergy() { return MuonEnergy; }
 
   std::vector<G4double>& GetNeutronxLoc() { return neutronxloc; }
   std::vector<G4double>& GetNeutronyLoc() { return neutronyloc; }
@@ -349,6 +350,7 @@ public:
   void AddMuonxMom(G4double posx) { Muonxmom.push_back(posx); }
   void AddMuonyMom(G4double posy) { Muonymom.push_back(posy); }
   void AddMuonzMom(G4double posz) { Muonzmom.push_back(posz); }
+  void AddMuonEnergy(G4double energy) { MuonEnergy.push_back(energy); }
 
   void AddEkin(G4double kin) { ekin.push_back(kin); }
   void AddNeutronxLoc(G4double posx) { neutronxloc.push_back(posx); }
@@ -622,6 +624,7 @@ private:
   std::vector<G4double> Muonxmom;
   std::vector<G4double> Muonymom;
   std::vector<G4double> Muonzmom;
+  std::vector<G4double> MuonEnergy;
 
   // -- additional data for other produced particles
   // - production location, timing and mass of nuclei produced in neutron capture in Ar
