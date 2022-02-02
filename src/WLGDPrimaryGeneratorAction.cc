@@ -309,6 +309,7 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 
     std::uniform_int_distribution<int> distribution(0, 3);
     std::uniform_real_distribution<>   rndm(0.0, 1.0);
+    std::uniform_real_distribution<>   cosThetaRnd(-1., 1.);
 
     G4double ran_x, ran_y, ran_z;
 
@@ -421,6 +422,7 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     G4double energy        = (*neutronEnergySpectrumInBPE)(generator) *MeV;
     //G4cout << energy / MeV << G4endl;
     G4double theta = rndm(generator) * 180. * deg;
+    G4double cosTheta = cosThetaRnd(generator);
     G4double phi   = rndm(generator) * 360. * deg;
     G4double x     = ran_x;
     G4double y     = ran_y;
@@ -431,9 +433,9 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     G4double theMass = theParticleTable->FindParticle("neutron")->GetPDGMass();
 
     G4double      totMomentum = std::sqrt(energy * energy + 2 * theMass * energy);
-    G4double      pz          = -1 * std::cos(theta);
-    G4double      px          = std::sin(theta) * cos(phi);
-    G4double      py          = std::sin(theta) * sin(phi);
+    G4double      pz          = cosTheta;
+    G4double      px          = std::sqrt(1 - std::pow(cosTheta,2)) * cos(phi);
+    G4double      py          = std::sqrt(1 - std::pow(cosTheta,2)) * sin(phi);
     G4ThreeVector momentumDir(px, py, pz);
 
     fParticleGun->SetParticleMomentumDirection(momentumDir);

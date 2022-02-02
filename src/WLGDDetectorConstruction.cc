@@ -209,7 +209,7 @@ void WLGDDetectorConstruction::ConstructSDandField()
     G4LogicalVolumeStore* volumeStore = G4LogicalVolumeStore::GetInstance();
 
     // -- Attach neutron XS biasing to Germanium -> enhance nCapture
-    /*auto *biasnXS = new WLGDBiasMultiParticleChangeCrossSection();
+    auto *biasnXS = new WLGDBiasMultiParticleChangeCrossSection();
     biasnXS->SetNeutronFactor(fNeutronBias);
     biasnXS->SetMuonFactor(fMuonBias);
     biasnXS->SetNeutronYieldFactor(fNeutronYieldBias);
@@ -224,7 +224,7 @@ void WLGDDetectorConstruction::ConstructSDandField()
     G4LogicalVolume *logicCavern = volumeStore->GetVolume("Cavern_log");
     biasnXS->AttachTo(logicCavern);
     G4LogicalVolume *logicHall = volumeStore->GetVolume("Hall_log");
-    biasnXS->AttachTo(logicHall);*/
+    biasnXS->AttachTo(logicHall);
 
     // -- Attach muon XS biasing to all required volumes consistently
     auto* biasmuXS = new WLGDBiasMultiParticleChangeCrossSection();
@@ -243,17 +243,17 @@ void WLGDDetectorConstruction::ConstructSDandField()
       biasmuXS->AddParticle("kaon-");
       biasmuXS->AddParticle("proton");
     }
-
-    G4LogicalVolume* logicGe = volumeStore->GetVolume("Ge_log");
+    //G4LogicalVolume* logicGe = volumeStore->GetVolume("Ge_log");
     biasmuXS->AttachTo(logicGe);
-    G4LogicalVolume* logicCavern = volumeStore->GetVolume("Cavern_log");
+    //G4LogicalVolume* logicCavern = volumeStore->GetVolume("Cavern_log");
     biasmuXS->AttachTo(logicCavern);
-    G4LogicalVolume* logicHall = volumeStore->GetVolume("Hall_log");
+    //G4LogicalVolume* logicHall = volumeStore->GetVolume("Hall_log");
     biasmuXS->AttachTo(logicHall);
-    G4LogicalVolume* logicTank = volumeStore->GetVolume("Tank_log");
+    //G4LogicalVolume* logicTank = volumeStore->GetVolume("Tank_log");
     biasmuXS->AttachTo(logicTank);
-    G4LogicalVolume* logicLar = volumeStore->GetVolume("Lar_log");
+    //G4LogicalVolume* logicLar = volumeStore->GetVolume("Lar_log");
     biasmuXS->AttachTo(logicLar);
+    
 
     // non hallA have these volumes
     if(fGeometryName != "hallA")
@@ -937,6 +937,12 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
 
     G4cout << "Total Mass of B-PE: "
            << boratedPETSolid_Tube->GetCubicVolume() * densityOfBPE << G4endl;
+    // G4cout << "/////////////////////////////////////////////////////////" << G4endl;
+    // G4cout << "ALTEZZA CILINDRO: " << b_height / cm << G4endl;
+    // G4cout << "SPESSORE CILINDRO: " << b_width * 2 / cm << G4endl;
+    // G4cout << "RAGGIO MINIMO: " << fBoratedTurbineRadius  << G4endl;
+    // G4cout << "RAGGIO MASSIMO: " << fBoratedTurbineRadius  + b_width /cm * 2 << G4endl;
+    // G4cout << "/////////////////////////////////////////////////////////" << G4endl;
 
     new G4PVPlacement(nullptr, G4ThreeVector(0, 0, fBoratedTurbinezPosition * cm),
                       fBoratedPETLogical_Tube, "BoratedPET_phys", fLarLogical, false, 0,
@@ -950,11 +956,11 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
 
     new G4PVPlacement(
       nullptr,
-      G4ThreeVector(0, 0, fBoratedTurbinezPosition * cm - b_height / 2 - b_width),
+      G4ThreeVector(0, 0, fBoratedTurbinezPosition * cm - b_height - b_width),
       fBoratedPETLogical_Tube, "BoratedPET_phys", fLarLogical, false, 0, true);
     new G4PVPlacement(
       nullptr,
-      G4ThreeVector(0, 0, fBoratedTurbinezPosition * cm + b_height / 2 + b_width),
+      G4ThreeVector(0, 0, fBoratedTurbinezPosition * cm + b_height + b_width),
       fBoratedPETLogical_Tube, "BoratedPET_phys", fLarLogical, false, 0, true);
   }
 
