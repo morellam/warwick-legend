@@ -29,8 +29,8 @@ void WLGDTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
   // Adding tracking of initial muons
   //if(aTrack->GetParticleDefinition()->GetParticleName() == "mu-" ||
   //   aTrack->GetParticleDefinition()->GetParticleName() == "mu+")
-  if(aTrack->GetParticleDefinition()->GetParticleName() == "neutron")
-  //if(aTrack->GetParticleDefinition()->GetPDGCharge() == 81)
+  if(aTrack->GetParticleDefinition()->GetParticleName() == "neutron" ||
+    aTrack->GetParticleDefinition()->GetPDGCharge() == 83)
   {
     auto tmp_vector = aTrack->GetVertexPosition();
     tmp_MuonXpos    = tmp_vector.getX() / m;

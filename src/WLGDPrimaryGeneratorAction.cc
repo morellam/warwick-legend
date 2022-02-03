@@ -382,11 +382,11 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     {
       G4double BPE_rad  = fDetector->GetBoratedTurbineRadius();
       G4double BPE_wid  = fDetector->GetBoratedTurbineWidth();
-      G4double BPE_hei  = fDetector->GetBoratedTurbineHeight() / 2.;
+      G4double BPE_hei  = fDetector->GetBoratedTurbineHeight();
       G4double BPE_zPos = fDetector->GetBoratedTurbinezPosition() * cm - 100 * cm;
 
       G4double volume_cyl =
-        3.1415926535 * BPE_hei * 2 * (pow(BPE_rad + BPE_wid, 2) - pow(BPE_rad, 2));
+        3.1415926535 * BPE_hei * (pow(BPE_rad + BPE_wid, 2) - pow(BPE_rad, 2));
       G4double volume_top = 3.1415926535 * BPE_wid * pow(BPE_rad + BPE_wid, 2);
 
       G4double prob_cyl = volume_cyl / (volume_cyl + 2 * volume_top);
@@ -402,19 +402,24 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
         G4double ran_phi = 360 * deg * rndm(generator);
         ran_x            = ran_rad * sin(ran_phi);
         ran_y            = ran_rad * cos(ran_phi);
-        ran_z            = BPE_hei * (1 - 2 * rndm(generator));
+        ran_z            = 1.25 * 2 * BPE_hei * (1 - 2 * rndm(generator)) + BPE_zPos;
       }
       if(where > 0)
       {
-        G4double ran_rad = BPE_rad * cm * rndm(generator);
+        G4double ran_rad = (BPE_rad + BPE_wid) * cm * sqrt(rndm(generator));
         G4double ran_phi = 360 * deg * rndm(generator);
         ran_x            = ran_rad * sin(ran_phi);
         ran_y            = ran_rad * cos(ran_phi);
-        ran_z            = BPE_wid * (1 - 2 * rndm(generator));
         if(where == 1)
-          ran_z += BPE_hei;
+        {
+          ran_z  =  BPE_wid * 10 * rndm(generator);
+          ran_z += 2 * BPE_hei + BPE_zPos + 30 * cm;
+        }
         if(where == 2)
-          ran_z -= BPE_hei;
+        {
+          ran_z  =  BPE_wid * 10 * (-rndm(generator));
+          ran_z += - 2 * BPE_hei + BPE_zPos - 30 * cm;
+        }
       }
     }
 
