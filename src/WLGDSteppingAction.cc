@@ -47,6 +47,31 @@ void WLGDSteppingAction::UserSteppingAction(const G4Step* aStep)
   }
 #endif
 
+  // Edit: 2022/02/08 by Michele Morella
+  // Adding target nucleus of neutron capture
+  G4SteppingManager*  steppingManager = fpSteppingManager;
+  
+  // check if it is alive
+  if(aStep->GetTrack()->GetTrackStatus() == fAlive) { return; }
+
+  // Retrieve the secondary particles
+  auto fSecondary = steppingManager -> GetfSecondary();
+
+  for(size_t lp1=0;lp1<(*fSecondary).size(); lp1++)
+  {
+    // Retrieve the info about the generation of secondary particles 
+    G4int encoding = (*fSecondary)[lp1] -> GetParticleDefinition() -> GetPDGEncoding();
+    // G4int charge = (*fSecondary)[lp1] -> GetParticleDefinition() -> GetPDGCharge();
+    // G4String process = (*fSecondary)[lp1]-> GetCreatorProcess()-> GetProcessName();   // process creating it
+    // G4int AA = (*fSecondary)[lp1] -> GetDynamicParticle() -> GetDefinition() -> GetBaryonNumber();
+    // G4String volumeName = (*fSecondary)[lp1] -> GetVolume() -> GetLogicalVolume() -> GetName(); // volume where secondary was generated 
+    // G4String secondaryParticleName =  (*fSecondary)[lp1]->GetDefinition() -> GetParticleName();  // name of the secondary
+    if(encoding == 1000320771 || encoding == 1000320770)
+    {
+      aStep->GetTrack()->SetTrackStatus(fKillTrackAndSecondaries);
+    }
+  }
+
   // Edit: 2021/04/07 by Moritz Neuberger
   // Adding total energy deposition inside LAr
 

@@ -243,16 +243,16 @@ void WLGDDetectorConstruction::ConstructSDandField()
       biasmuXS->AddParticle("kaon-");
       biasmuXS->AddParticle("proton");
     }
-    //G4LogicalVolume* logicGe = volumeStore->GetVolume("Ge_log");
-    biasmuXS->AttachTo(logicGe);
-    //G4LogicalVolume* logicCavern = volumeStore->GetVolume("Cavern_log");
-    biasmuXS->AttachTo(logicCavern);
-    //G4LogicalVolume* logicHall = volumeStore->GetVolume("Hall_log");
-    biasmuXS->AttachTo(logicHall);
-    //G4LogicalVolume* logicTank = volumeStore->GetVolume("Tank_log");
-    biasmuXS->AttachTo(logicTank);
-    //G4LogicalVolume* logicLar = volumeStore->GetVolume("Lar_log");
-    biasmuXS->AttachTo(logicLar);
+    // //G4LogicalVolume* logicGe = volumeStore->GetVolume("Ge_log");
+    // biasmuXS->AttachTo(logicGe);
+    // //G4LogicalVolume* logicCavern = volumeStore->GetVolume("Cavern_log");
+    // biasmuXS->AttachTo(logicCavern);
+    // //G4LogicalVolume* logicHall = volumeStore->GetVolume("Hall_log");
+    // biasmuXS->AttachTo(logicHall);
+    // //G4LogicalVolume* logicTank = volumeStore->GetVolume("Tank_log");
+    // biasmuXS->AttachTo(logicTank);
+    // //G4LogicalVolume* logicLar = volumeStore->GetVolume("Lar_log");
+    // biasmuXS->AttachTo(logicLar);
     
 
     // non hallA have these volumes
@@ -931,7 +931,7 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
 
     boratedPETSolid_Tube = new G4Tubs("BoratedPET", fBoratedTurbineRadius * cm,
                                       (fBoratedTurbineRadius * cm + b_width * 2),
-                                      b_height / 2, 0.0, CLHEP::twopi);
+                                      b_height, 0.0, CLHEP::twopi);
     fBoratedPETLogical_Tube =
       new G4LogicalVolume(boratedPETSolid_Tube, BoratedPETMat, "BoratedPET_Logical");
 
