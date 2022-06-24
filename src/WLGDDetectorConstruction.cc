@@ -76,6 +76,8 @@ void WLGDDetectorConstruction::DefineMaterials()
   auto* O  = new G4Element("Oxygen", "O", 8., 16.00 * g / mole);
   auto* Ca = new G4Element("Calcium", "Ca", 20., 40.08 * g / mole);
   auto* Mg = new G4Element("Magnesium", "Mg", 12., 24.31 * g / mole);
+  // auto* Gd = new G4Element("Gadolinium", "Gd", 64., 157.25 * g / mole);
+  // auto* Pb = new G4Element("Lead", "Pb", 82., 207.2 * g / mole);
 
   // Standard Rock definition, similar to Gran Sasso rock
   // with density from PDG report
@@ -115,6 +117,22 @@ void WLGDDetectorConstruction::DefineMaterials()
   PMMA->AddElement(H, 0.08);
   PMMA->AddElement(C, 0.60);
   PMMA->AddElement(O, 0.32);
+
+  // // Estimated using the number of elements per chain elements  (C_5 O_2 H_8)
+  // // adding 2% gadolinium
+  // auto* GdLoadedPMMA = new G4Material("GdLoadedPMMA", 1.18 * g / cm3, 4);
+  // GdLoadedPMMA->AddElement(H, 0.08);
+  // GdLoadedPMMA->AddElement(C, 0.59);
+  // GdLoadedPMMA->AddElement(O, 0.31);
+  // GdLoadedPMMA->AddElement(Gd, 0.02);
+
+  // // Estimated using the number of elements per chain elements  (C_5 O_2 H_8)
+  // // adding 2% gadolinium
+  // auto* PbLoadedPMMA = new G4Material("PbLoadedPMMA", 1.18 * g / cm3, 4);
+  // PbLoadedPMMA->AddElement(H, 0.08);
+  // PbLoadedPMMA->AddElement(C, 0.59);
+  // PbLoadedPMMA->AddElement(O, 0.31);
+  // PbLoadedPMMA->AddElement(Pb, 0.02);
 
   // Estimated using the number of elements per molecule (C_2 H_4)
   auto* PolyEthylene = new G4Material("PolyEthylene", 0.95 * g / cm3, 2);
@@ -184,6 +202,10 @@ void WLGDDetectorConstruction::DefineMaterials()
   CombinedArXeHe3->AddElement(eLXe, fXeConc);
 
   G4cout << CombinedArXeHe3 << G4endl;
+
+  G4Material* liquidNitrogen = new G4Material("liquidNitrogen", 7, 14, 0.8064 * g / cm3, kStateLiquid, 77. * kelvin);
+
+  G4cout << liquidNitrogen << G4endl;
 }
 
 void WLGDDetectorConstruction::ConstructSDandField()
@@ -406,8 +428,8 @@ auto WLGDDetectorConstruction::SetupAlternative() -> G4VPhysicalVolume*
   // LAr
   //
   auto* larSolid     = new G4Box("LAr", larside * cm, larside * cm, larside * cm);
-  auto* fLarLogical  = new G4LogicalVolume(larSolid, larMat, "Lar_log");
-  auto* fLarPhysical = new G4PVPlacement(nullptr, G4ThreeVector(), fLarLogical,
+  auto* fLNLogical  = new G4LogicalVolume(larSolid, larMat, "Lar_log");
+  auto* fLarPhysical = new G4PVPlacement(nullptr, G4ThreeVector(), fLNLogical,
                                          "Lar_phys", fMembraneLogical, false, 0, true);
 
   //
@@ -473,31 +495,31 @@ auto WLGDDetectorConstruction::SetupAlternative() -> G4VPhysicalVolume*
 
   // placements
   new G4PVPlacement(nullptr, G4ThreeVector(ringrad * cm, 0., cushift * cm),
-                    fCopperLogical, "Copper_phys", fLarLogical, false, 0, true);
+                    fCopperLogical, "Copper_phys", fLNLogical, false, 0, true);
 
   new G4PVPlacement(nullptr, G4ThreeVector(ringrad * cm, 0., cushift * cm), fUlarLogical,
-                    "ULar_phys", fLarLogical, false, 0, true);
+                    "ULar_phys", fLNLogical, false, 0, true);
 
   // tower 2
   new G4PVPlacement(nullptr, G4ThreeVector(0., ringrad * cm, cushift * cm),
-                    fCopperLogical, "Copper_phys2", fLarLogical, false, 1, true);
+                    fCopperLogical, "Copper_phys2", fLNLogical, false, 1, true);
 
   new G4PVPlacement(nullptr, G4ThreeVector(0., ringrad * cm, cushift * cm), fUlarLogical,
-                    "ULar_phys2", fLarLogical, false, 1, true);
+                    "ULar_phys2", fLNLogical, false, 1, true);
 
   // tower 3
   new G4PVPlacement(nullptr, G4ThreeVector(-ringrad * cm, 0., cushift * cm),
-                    fCopperLogical, "Copper_phys3", fLarLogical, false, 2, true);
+                    fCopperLogical, "Copper_phys3", fLNLogical, false, 2, true);
 
   new G4PVPlacement(nullptr, G4ThreeVector(-ringrad * cm, 0., cushift * cm), fUlarLogical,
-                    "ULar_phys3", fLarLogical, false, 2, true);
+                    "ULar_phys3", fLNLogical, false, 2, true);
 
   // tower 4
   new G4PVPlacement(nullptr, G4ThreeVector(0., -ringrad * cm, cushift * cm),
-                    fCopperLogical, "Copper_phys4", fLarLogical, false, 3, true);
+                    fCopperLogical, "Copper_phys4", fLNLogical, false, 3, true);
 
   new G4PVPlacement(nullptr, G4ThreeVector(0., -ringrad * cm, cushift * cm), fUlarLogical,
-                    "ULar_phys4", fLarLogical, false, 3, true);
+                    "ULar_phys4", fLNLogical, false, 3, true);
 
   //
   // Visualization attributes
@@ -518,7 +540,7 @@ auto WLGDDetectorConstruction::SetupAlternative() -> G4VPhysicalVolume*
   fTankLogical->SetVisAttributes(blueVisAtt);
   fPuLogical->SetVisAttributes(greyVisAtt);
   fMembraneLogical->SetVisAttributes(blueVisAtt);
-  fLarLogical->SetVisAttributes(greyVisAtt);
+  fLNLogical->SetVisAttributes(greyVisAtt);
   fCopperLogical->SetVisAttributes(greenVisAtt);
   fUlarLogical->SetVisAttributes(greyVisAtt);
   fGeLogical->SetVisAttributes(redVisAtt);
@@ -544,7 +566,12 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
     BoratedPETMat = G4Material::GetMaterial("PolyEthylene");
   if(fSetMaterial == "PMMA")
     BoratedPETMat = G4Material::GetMaterial("PMMA");
+    if(fSetMaterial == "GdLoadedPMMA")
+    BoratedPETMat = G4Material::GetMaterial("GdLoadedPMMA");
+    if(fSetMaterial == "PbLoadedPMMA")
+    BoratedPETMat = G4Material::GetMaterial("PbLoadedPMMA");
   auto* larMat /*_alt*/ = G4Material::GetMaterial("CombinedArXeHe3");
+  auto *lnMat = G4Material::GetMaterial("liquidNitrogen");
   // if(fXeConc != 0 || fHe3Conc != 0) BoratedPET
   larMat = CombinedArXeHe3;
   // G4cout << larMat << G4endl;
@@ -695,13 +722,13 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
                                           "Cinn_phys", fCvacLogical, false, 0, true);
 
   //
-  // LAr bath
+  // LN2 bath
   //
-  auto* larSolid     = new G4Tubs("LAr", 0.0 * cm, (cryrad - 2 * cryowall - vacgap) * cm,
+  auto* lnSolid     = new G4Tubs("LN2", 0.0 * cm, (cryrad - 2 * cryowall - vacgap) * cm,
                                   cryhheight * cm, 0.0, CLHEP::twopi);
-  auto* fLarLogical  = new G4LogicalVolume(larSolid, larMat, "Lar_log");
-  auto* fLarPhysical = new G4PVPlacement(nullptr, G4ThreeVector(), fLarLogical,
-                                         "Lar_phys", fCinnLogical, false, 0, true);
+  auto* fLNLogical  = new G4LogicalVolume(lnSolid, lnMat, "LN2_log");
+  auto* fLNPhysical = new G4PVPlacement(nullptr, G4ThreeVector(), fLNLogical,
+                                         "LN2_phys", fCinnLogical, false, 0, true);
 
   //
   // cryostat Lid
@@ -800,54 +827,54 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
     // placements
     if(fWithBoratedPET == 1)
       new G4PVPlacement(nullptr, G4ThreeVector(ringrad * cm, 0., cushift * cm),
-                        fBoratedPETLogical_Tube, "BoratedPET_phys", fLarLogical, false, 0,
+                        fBoratedPETLogical_Tube, "BoratedPET_phys", fLNLogical, false, 0,
                         true);
 
     if(fWithOutCupperTubes == 0)
       new G4PVPlacement(nullptr, G4ThreeVector(ringrad * cm, 0., cushift * cm),
-                        fCopperLogical, "Copper_phys", fLarLogical, false, 0, true);
+                        fCopperLogical, "Copper_phys", fLNLogical, false, 0, true);
 
     new G4PVPlacement(nullptr, G4ThreeVector(ringrad * cm, 0., cushift * cm),
-                      fUlarLogical, "ULar_phys", fLarLogical, false, 0, true);
+                      fUlarLogical, "ULar_phys", fLNLogical, false, 0, true);
 
     // tower 2
     if(fWithBoratedPET == 1)
       new G4PVPlacement(nullptr, G4ThreeVector(0., ringrad * cm, cushift * cm),
-                        fBoratedPETLogical_Tube, "BoratedPET_phys2", fLarLogical, false,
+                        fBoratedPETLogical_Tube, "BoratedPET_phys2", fLNLogical, false,
                         1, true);
 
     if(fWithOutCupperTubes == 0)
       new G4PVPlacement(nullptr, G4ThreeVector(0., ringrad * cm, cushift * cm),
-                        fCopperLogical, "Copper_phys2", fLarLogical, false, 1, true);
+                        fCopperLogical, "Copper_phys2", fLNLogical, false, 1, true);
 
     new G4PVPlacement(nullptr, G4ThreeVector(0., ringrad * cm, cushift * cm),
-                      fUlarLogical, "ULar_phys2", fLarLogical, false, 1, true);
+                      fUlarLogical, "ULar_phys2", fLNLogical, false, 1, true);
 
     // tower 3
     if(fWithBoratedPET == 1)
       new G4PVPlacement(nullptr, G4ThreeVector(-ringrad * cm, 0., cushift * cm),
-                        fBoratedPETLogical_Tube, "BoratedPET_phys3", fLarLogical, false,
+                        fBoratedPETLogical_Tube, "BoratedPET_phys3", fLNLogical, false,
                         2, true);
 
     if(fWithOutCupperTubes == 0)
       new G4PVPlacement(nullptr, G4ThreeVector(-ringrad * cm, 0., cushift * cm),
-                        fCopperLogical, "Copper_phys3", fLarLogical, false, 2, true);
+                        fCopperLogical, "Copper_phys3", fLNLogical, false, 2, true);
 
     new G4PVPlacement(nullptr, G4ThreeVector(-ringrad * cm, 0., cushift * cm),
-                      fUlarLogical, "ULar_phys3", fLarLogical, false, 2, true);
+                      fUlarLogical, "ULar_phys3", fLNLogical, false, 2, true);
 
     // tower 4
     if(fWithBoratedPET == 1)
       new G4PVPlacement(nullptr, G4ThreeVector(0., -ringrad * cm, cushift * cm),
-                        fBoratedPETLogical_Tube, "BoratedPET_phys4", fLarLogical, false,
+                        fBoratedPETLogical_Tube, "BoratedPET_phys4", fLNLogical, false,
                         3, true);
 
     if(fWithOutCupperTubes == 0)
       new G4PVPlacement(nullptr, G4ThreeVector(0., -ringrad * cm, cushift * cm),
-                        fCopperLogical, "Copper_phys4", fLarLogical, false, 3, true);
+                        fCopperLogical, "Copper_phys4", fLNLogical, false, 3, true);
 
     new G4PVPlacement(nullptr, G4ThreeVector(0., -ringrad * cm, cushift * cm),
-                      fUlarLogical, "ULar_phys4", fLarLogical, false, 3, true);
+                      fUlarLogical, "ULar_phys4", fLNLogical, false, 3, true);
   }
 
   if(fGeometryName == "baseline_smaller")
@@ -855,15 +882,15 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
     // placements
     if(fWithBoratedPET == 1)
       new G4PVPlacement(nullptr, G4ThreeVector(0., 0., cushift * cm),
-                        fBoratedPETLogical_Tube, "BoratedPET_phys", fLarLogical, false, 0,
+                        fBoratedPETLogical_Tube, "BoratedPET_phys", fLNLogical, false, 0,
                         true);
 
     if(fWithOutCupperTubes == 0)
       new G4PVPlacement(nullptr, G4ThreeVector(0., 0., cushift * cm), fCopperLogical,
-                        "Copper_phys", fLarLogical, false, 0, true);
+                        "Copper_phys", fLNLogical, false, 0, true);
 
     new G4PVPlacement(nullptr, G4ThreeVector(0., 0., cushift * cm), fUlarLogical,
-                      "ULar_phys", fLarLogical, false, 0, true);
+                      "ULar_phys", fLNLogical, false, 0, true);
   }
 
 #define whichGeometry 1
@@ -883,7 +910,7 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
       rotMat = new G4RotationMatrix;
       rotMat->rotateZ(-(j + 1) * anglePanel + 90 * deg);
       new G4PVPlacement(rotMat, G4ThreeVector(xpos, ypos, zpos), fBoratedPETLogical_Box,
-                        "BoratedPET_phys", fLarLogical, false, j, true);
+                        "BoratedPET_phys", fLNLogical, false, j, true);
     }
   }
 #endif
@@ -920,7 +947,7 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
       rotMat = new G4RotationMatrix;
       rotMat->rotateZ(-j * anglePanel + 90 * deg + constantAngle);
       new G4PVPlacement(rotMat, G4ThreeVector(xpos, ypos, zpos), fBoratedPETLogical_Box,
-                        "BoratedPET_phys", fLarLogical, false, j, true);
+                        "BoratedPET_phys", fLNLogical, false, j, true);
     }
   }
 #endif
@@ -945,7 +972,7 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
     // G4cout << "/////////////////////////////////////////////////////////" << G4endl;
 
     new G4PVPlacement(nullptr, G4ThreeVector(0, 0, fBoratedTurbinezPosition * cm),
-                      fBoratedPETLogical_Tube, "BoratedPET_phys", fLarLogical, false, 0,
+                      fBoratedPETLogical_Tube, "BoratedPET_phys", fLNLogical, false, 0,
                       true);
 
     boratedPETSolid_Tube =
@@ -957,11 +984,11 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
     new G4PVPlacement(
       nullptr,
       G4ThreeVector(0, 0, fBoratedTurbinezPosition * cm - b_height - b_width),
-      fBoratedPETLogical_Tube, "BoratedPET_phys", fLarLogical, false, 0, true);
+      fBoratedPETLogical_Tube, "BoratedPET_phys", fLNLogical, false, 0, true);
     new G4PVPlacement(
       nullptr,
       G4ThreeVector(0, 0, fBoratedTurbinezPosition * cm + b_height + b_width),
-      fBoratedPETLogical_Tube, "BoratedPET_phys", fLarLogical, false, 0, true);
+      fBoratedPETLogical_Tube, "BoratedPET_phys", fLNLogical, false, 0, true);
   }
 
   //
@@ -1003,7 +1030,7 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
   fHallLogical->SetVisAttributes(whiteVisAtt);
   fTankLogical->SetVisAttributes(greyVisAtt);
   fWaterLogical->SetVisAttributes(testVisAtt);
-  fLarLogical->SetVisAttributes(testVisAtt2);
+  fLNLogical->SetVisAttributes(testVisAtt2);
   fCoutLogical->SetVisAttributes(greyVisAtt);
   fCvacLogical->SetVisAttributes(greyVisAtt);
   fCinnLogical->SetVisAttributes(greyVisAtt);
@@ -1148,8 +1175,8 @@ auto WLGDDetectorConstruction::SetupHallA() -> G4VPhysicalVolume*
   //
   auto* larSolid     = new G4Tubs("LAr", 0.0 * cm, (cryrad - 2 * cryowall - vacgap) * cm,
                                   cryhheight * cm, 0.0, CLHEP::twopi);
-  auto* fLarLogical  = new G4LogicalVolume(larSolid, larMat, "Lar_log");
-  auto* fLarPhysical = new G4PVPlacement(nullptr, G4ThreeVector(), fLarLogical,
+  auto* fLNLogical  = new G4LogicalVolume(larSolid, larMat, "Lar_log");
+  auto* fLarPhysical = new G4PVPlacement(nullptr, G4ThreeVector(), fLNLogical,
                                          "Lar_phys", fCinnLogical, false, 0, true);
 
   //
@@ -1211,7 +1238,7 @@ auto WLGDDetectorConstruction::SetupHallA() -> G4VPhysicalVolume*
         nullptr,
         G4ThreeVector(xpos, ypos,
                       -step + (nofLayers / 2 * layerthickness - i * layerthickness) * cm),
-        fLayerLogical, "Layer_phys", fLarLogical, false, i + j * nofLayers, true);
+        fLayerLogical, "Layer_phys", fLNLogical, false, i + j * nofLayers, true);
     }
   }
 
@@ -1233,7 +1260,7 @@ auto WLGDDetectorConstruction::SetupHallA() -> G4VPhysicalVolume*
   fHallLogical->SetVisAttributes(greyVisAtt);
   fTankLogical->SetVisAttributes(greenVisAtt);
   fWaterLogical->SetVisAttributes(greyVisAtt);
-  fLarLogical->SetVisAttributes(greyVisAtt);
+  fLNLogical->SetVisAttributes(greyVisAtt);
   fCoutLogical->SetVisAttributes(blueVisAtt);
   fCvacLogical->SetVisAttributes(greyVisAtt);
   fCinnLogical->SetVisAttributes(blueVisAtt);
@@ -1505,7 +1532,9 @@ void WLGDDetectorConstruction::DefineCommands()
     .SetGuidance("BoratedPE = normal case")
     .SetGuidance("PolyEthylene = without Boron")
     .SetGuidance("PMMA = instead using PMMA")
-    .SetCandidates("BoratedPE PolyEthylene PMMA")
+    .SetGuidance("GdLoadedPMMA = using Gd loaded PMMA")
+    .SetGuidance("PbLoadedPMMA = using Pb loaded PMMA")
+    .SetCandidates("BoratedPE PolyEthylene PMMA GdLoadedPMMA PbLoadedPMMA")
     .SetDefaultValue("BoratedPE");
 
   // option to set the radius of the turbine structure
